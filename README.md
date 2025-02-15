@@ -28,21 +28,23 @@ schema := []columnusage.Column{
     {"system", "clusters", "estimated_recovery_time"},
     // ...
 }
-analyser := columnusage.NewColumnUsageAnalyser(schema)
+
 query := `
-select clu.host_name as hostName, coalesce(val.value, 0) as value
-from system.clusters as clu
-left join (
-select fullHostName() as hostName, sum(rows) as value
-from cluster('shards', system, part_log)
-where Database = 'raw'
-  and table = 'events'
-  and event_type = 'NewPart'
-  and event_time between subtractMinutes(now(), 5) and now()
-group by hostName
-) as val on clu.host_name = val.hostName
-where clu.cluster = 'shards'
+    select clu.host_name as hostName, coalesce(val.value, 0) as value
+    from system.clusters as clu
+    left join (
+    select fullHostName() as hostName, sum(rows) as value
+    from cluster('shards', system, part_log)
+    where Database = 'raw'
+      and table = 'events'
+      and event_type = 'NewPart'
+      and event_time between subtractMinutes(now(), 5) and now()
+    group by hostName
+    ) as val on clu.host_name = val.hostName
+    where clu.cluster = 'shards'
 `
+
+analyser := columnusage.NewColumnUsageAnalyser(schema)
 res, err := analyser.ParseQuery("default", query)
 if err != nil {
     // ...
