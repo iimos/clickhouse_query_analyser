@@ -2,9 +2,16 @@
 
 Go lib for analysis of ClickHouse columns usage in SQL
 
+## Installation
+```console
+go get github.com/iimos/clickhouse_query_analyser
+```
+
 ## Usage
 
 ```go
+import "github.com/iimos/clickhouse_query_analyser/columnusage"
+
 schema := []columnusage.Column{
     {"system", "numbers", "number"},
     {"system", "clusters", "cluster"},
